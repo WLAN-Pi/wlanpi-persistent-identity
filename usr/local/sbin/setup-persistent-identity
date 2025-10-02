@@ -1,0 +1,73 @@
+#!/bin/bash
+set -e
+
+PERSISTENT_BASE="/home/.persistent-identity"
+LOG_TAG="persistent-identity"
+LOG_FILE="/var/log/wlanpi-persistent-identity.log"
+
+log() {
+    local msg="$(date '+%Y-%m-%d %H:%M:%S') - $1"
+    echo "$1"
+    logger -t "$LOG_TAG" "$1"
+    echo "$msg" >> "$LOG_FILE"
+}
+
+error() {
+    local msg="$(date '+%Y-%m-%d %H:%M:%S') - ERROR: $1"
+    echo "ERROR: $1" >&2
+    logger -t "$LOG_TAG" -p user.err "ERROR: $1"
+    echo "$msg" >> "$LOG_FILE"
+}
+
+touch "$LOG_FILE" 2>/dev/null || {
+    logger -t "$LOG_TAG" "WARNING: Cannot write to $LOG_FILE"
+}
+
+log "Starting persistent identity setup"
+
+if ! mountpoint -q /home; then
+    error "/home is not mounted - cannot setup persistent identity"
+    exit 1
+fi
+
+mkdir -p "$PERSISTENT_BASE"
+log "Using persistent storage at $PERSISTENT_BASE"
+
+FILES=(
+    "/etc/ssh/ssh_host_rsa_key"
+    "/etc/ssh/ssh_host_rsa_key.pub"
+    "/etc/ssh/ssh_host_ecdsa_key"
+    "/etc/ssh/ssh_host_ecdsa_key.pub"
+    "/etc/ssh/ssh_host_ed25519_key"
+    "/etc/ssh/ssh_host_ed25519_key.pub"
+    "/etc/machine-id"
+)
+
+for file in "${FILES[@]}"; do
+    if mountpoint -q "$file" 2>/dev/null; then
+        log "Skipping $file - already mounted"
+        continue
+    fi
+    
+    if [ ! -e "$file" ]; then
+        log "Skipping $file - does not exist in this partition"
+        continue
+    fi
+    
+    persistent_file="$PERSISTENT_BASE${file}"
+    mkdir -p "$(dirname "$persistent_file")"
+    
+    if [ ! -f "$persistent_file" ]; then
+        log "Initializing $file in persistent storage"
+        cp -a "$file" "$persistent_file"
+    fi
+    
+    log "Bind mounting $file"
+    if ! mount --bind "$persistent_file" "$file"; then
+        error "Failed to bind mount $file"
+        exit 1
+    fi
+done
+
+log "Persistent identity setup complete"
+log "###"

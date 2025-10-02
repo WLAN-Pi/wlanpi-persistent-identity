@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+
+chmod +x /usr/local/sbin/setup-persistent-identity
+
+systemctl daemon-reload
+systemctl enable wlanpi-persistent-identity.service
+
+echo "wlanpi-persistent-identity installed. Persistence will activate on next boot."
+echo "To activate now: sudo systemctl start wlanpi-persistent-identity.service"
+
+exit 0

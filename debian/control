@@ -1,0 +1,16 @@
+Source: wlanpi-persistent-identity
+Version: 1.0.0
+Section: admin
+Priority: optional
+Architecture: all
+Maintainer: Josh Schmelzle <josh@joshschmelzle.com>
+Standards-Version: 4.6.2
+Build-Depends: debhelper-compat (= 13)
+
+Package: wlanpi-persistent-identity
+Architecture: all
+Depends: ${misc:Depends}
+Description: Maintains persistent system identity across A/B partition switches
+ Preserves SSH host keys and machine-id to prevent "host identification changed"
+ warnings and ensure consistent DHCP leases and network profiles when switching
+ between root partitions.

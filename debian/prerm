@@ -1,0 +1,7 @@
+#!/bin/bash
+set -e
+
+systemctl disable wlanpi-persistent-identity.service 2>/dev/null || true
+systemctl stop wlanpi-persistent-identity.service 2>/dev/null || true
+
+exit 0
