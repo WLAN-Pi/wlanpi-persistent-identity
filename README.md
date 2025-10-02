@@ -58,7 +58,7 @@ systemctl status wlanpi-persistent-identity.service
 Bind mounts:
 
 ```bash
-mount | grep persistent-identity
+mount | grep /etc
 ```
 
 Check persistent storage:
