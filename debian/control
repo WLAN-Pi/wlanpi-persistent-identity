@@ -9,6 +9,6 @@ Build-Depends: debhelper-compat (= 13)
 
 Package: wlanpi-persistent-identity
 Architecture: all
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, logrotate
 Description: Prevents "host identification changed" SSH warnings and maintains stable 
   machine-id for systemd services across A/B partition switches.

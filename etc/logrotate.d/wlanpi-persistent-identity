@@ -1,0 +1,7 @@
+/var/log/wlanpi-persistent-identity.log {
+    monthly
+    rotate 1
+    compress
+    missingok
+    notifempty
+}
