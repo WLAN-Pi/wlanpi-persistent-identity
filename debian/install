@@ -1,0 +1,2 @@
+usr/local/sbin/setup-persistent-identity
+etc/systemd/system/wlanpi-persistent-identity.service
