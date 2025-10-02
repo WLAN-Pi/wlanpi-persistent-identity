@@ -10,7 +10,5 @@ Build-Depends: debhelper-compat (= 13)
 Package: wlanpi-persistent-identity
 Architecture: all
 Depends: ${misc:Depends}
-Description: Maintains persistent system identity across A/B partition switches
- Preserves SSH host keys and machine-id to prevent "host identification changed"
- warnings and ensure consistent DHCP leases and network profiles when switching
- between root partitions.
+Description: Prevents "host identification changed" SSH warnings and maintains stable 
+  machine-id for systemd services across A/B partition switches.

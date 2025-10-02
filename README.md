@@ -1,6 +1,6 @@
 # wlanpi-persistent-identity
 
-Maintains persistent system identity across A/B partition switches by preserving SSH host keys and machine-id. Prevents "host identification changed" warnings and ensures consistent DHCP leases and network profiles when switching between root partitions.
+Prevents "host identification changed" SSH warnings and maintains stable machine-id for systemd services across A/B partition switches.
 
 ## How it works
 
