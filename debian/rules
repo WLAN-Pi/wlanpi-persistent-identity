@@ -2,3 +2,6 @@
 
 %:
 	dh $@
+
+override_dh_usrlocal:
+	# Skip dh_usrlocal 
