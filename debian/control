@@ -1,5 +1,5 @@
 Source: wlanpi-persistent-identity
-Version: 1.0.0
+Version: 1.1.0
 Section: admin
 Priority: optional
 Architecture: all
@@ -9,6 +9,6 @@ Build-Depends: debhelper-compat (= 13)
 
 Package: wlanpi-persistent-identity
 Architecture: all
-Depends: ${misc:Depends}, logrotate
+Depends: ${misc:Depends}, logrotate, openssh-client
 Description: Prevents "host identification changed" SSH warnings and maintains stable 
   machine-id for systemd services across A/B partition switches.

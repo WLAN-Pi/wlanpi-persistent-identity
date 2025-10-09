@@ -1,16 +1,15 @@
 [Unit]
 Description=Persistent system identity for A/B partitions
 Documentation=https://github.com/wlan-pi/wlanpi-persistent-identity
-After=local-fs.target
-Before=ssh.service systemd-hostnamed.service network-pre.target
 DefaultDependencies=no
+After=local-fs.target
+Before=systemd-journald.service ssh.service systemd-hostnamed.service systemd-networkd.service
+RequiresMountsFor=/home
 
 [Service]
 Type=oneshot
 ExecStart=/usr/local/sbin/setup-persistent-identity
 RemainAfterExit=yes
-StandardOutput=journal
-StandardError=journal
 
 [Install]
 WantedBy=sysinit.target

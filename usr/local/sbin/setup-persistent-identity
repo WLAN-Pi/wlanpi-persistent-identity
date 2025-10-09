@@ -1,27 +1,30 @@
 #!/bin/bash
-set -e
 
 PERSISTENT_BASE="/home/.persistent-identity"
 LOG_TAG="persistent-identity"
 LOG_FILE="/var/log/wlanpi-persistent-identity.log"
 
 log() {
-    local msg="$(date '+%Y-%m-%d %H:%M:%S') - $1"
-    echo "$1"
-    logger -t "$LOG_TAG" "$1"
-    echo "$msg" >> "$LOG_FILE"
+    local msg="$1"
+    local timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
+    
+    echo "$msg"
+    logger -t "$LOG_TAG" "$msg" 2>/dev/null || true
+    echo "$timestamp - $msg" >> "$LOG_FILE" 2>/dev/null || true
 }
 
 error() {
-    local msg="$(date '+%Y-%m-%d %H:%M:%S') - ERROR: $1"
-    echo "ERROR: $1" >&2
-    logger -t "$LOG_TAG" -p user.err "ERROR: $1"
-    echo "$msg" >> "$LOG_FILE"
+    local msg="ERROR: $1"
+    local timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
+    
+    echo "$msg" >&2
+    logger -t "$LOG_TAG" -p user.err "$msg" 2>/dev/null || true
+    echo "$timestamp - $msg" >> "$LOG_FILE" 2>/dev/null || true
+    return 1
 }
 
-touch "$LOG_FILE" 2>/dev/null || {
-    logger -t "$LOG_TAG" "WARNING: Cannot write to $LOG_FILE"
-}
+mkdir -p "$(dirname "$LOG_FILE")" 2>/dev/null || true
+touch "$LOG_FILE" 2>/dev/null || true
 
 log "Starting persistent identity setup"
 
@@ -30,17 +33,19 @@ if ! mountpoint -q /home; then
     exit 1
 fi
 
-mkdir -p "$PERSISTENT_BASE"
+if ! mkdir -p "$PERSISTENT_BASE"; then
+    error "Failed to create persistent storage directory"
+    exit 1
+fi
+
 log "Using persistent storage at $PERSISTENT_BASE"
 
 FILES=(
-    "/etc/ssh/ssh_host_rsa_key"
-    "/etc/ssh/ssh_host_rsa_key.pub"
+    "/etc/machine-id"
     "/etc/ssh/ssh_host_ecdsa_key"
     "/etc/ssh/ssh_host_ecdsa_key.pub"
     "/etc/ssh/ssh_host_ed25519_key"
     "/etc/ssh/ssh_host_ed25519_key.pub"
-    "/etc/machine-id"
 )
 
 for file in "${FILES[@]}"; do
@@ -49,25 +54,79 @@ for file in "${FILES[@]}"; do
         continue
     fi
     
-    if [ ! -e "$file" ]; then
-        log "Skipping $file - does not exist in this partition"
-        continue
-    fi
-    
     persistent_file="$PERSISTENT_BASE${file}"
     mkdir -p "$(dirname "$persistent_file")"
-    
-    if [ ! -f "$persistent_file" ]; then
-        log "Initializing $file in persistent storage"
-        cp -a "$file" "$persistent_file"
+
+    if [ -f "$persistent_file" ]; then
+        if [ -e "$file" ]; then
+            log "Overwriting $file with persistent version"
+            if ! cp -a "$persistent_file" "$file"; then
+                error "Failed to overwrite $file"
+                continue
+            fi
+        else
+            log "Restoring $file from persistent storage"
+            mkdir -p "$(dirname "$file")"
+            if ! cp -a "$persistent_file" "$file"; then
+                error "Failed to restore $file"
+                continue
+            fi
+        fi
+    elif [ -e "$file" ]; then
+        log "Saving $file to persistent storage"
+        if ! cp -a "$file" "$persistent_file"; then
+            error "Failed to save $file"
+            continue
+        fi
+    else
+        case "$file" in
+            /etc/machine-id)
+                log "Generating machine-id"
+                if ! systemd-machine-id-setup; then
+                    error "Failed to generate machine-id"
+                    continue
+                fi
+                ;;
+            /etc/ssh/ssh_host_ed25519_key)
+                log "Generating ed25519 SSH host key"
+                if ! ssh-keygen -t ed25519 -f "$file" -N "" -q; then
+                    error "Failed to generate ed25519 key"
+                    continue
+                fi
+                chmod 600 "$file"
+                chmod 644 "${file}.pub"
+                ;;
+            /etc/ssh/ssh_host_ecdsa_key)
+                log "Generating ecdsa SSH host key"
+                if ! ssh-keygen -t ecdsa -f "$file" -N "" -q; then
+                    error "Failed to generate ecdsa key"
+                    continue
+                fi
+                chmod 600 "$file"
+                chmod 644 "${file}.pub"
+                ;;
+            *)
+                log "Skipping $file - not generated"
+                continue
+                ;;
+        esac
+
+        if [ -e "$file" ]; then
+            log "Saving generated $file to persistent storage"
+            if ! cp -a "$file" "$persistent_file"; then
+                error "Failed to save generated $file"
+                continue
+            fi
+        fi
     fi
-    
-    log "Bind mounting $file"
-    if ! mount --bind "$persistent_file" "$file"; then
-        error "Failed to bind mount $file"
-        exit 1
+
+    if [ -f "$persistent_file" ] && [ -e "$file" ]; then
+        log "Bind mounting $file"
+        if ! mount --bind "$persistent_file" "$file"; then
+            error "Failed to bind mount $file"
+            continue
+        fi
     fi
 done
 
 log "Persistent identity setup complete"
-log "###"
