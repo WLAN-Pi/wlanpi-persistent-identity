@@ -8,6 +8,7 @@ on:
       - '**/*.md'
       - '**/.MD'
       - .github/dependabot.yml
+      - .github/workflows/*.yml
       - .gitignore
       - LICENSE
   pull_request:
@@ -16,6 +17,7 @@ on:
     paths-ignore: # ignore files that don't change build output
       - '**/*.md'
       - '**/.MD'
+      - .github/workflows/*.yml
       - .github/dependabot.yml
       - .gitignore
       - LICENSE
