@@ -4,23 +4,9 @@ on:
   push:
     branches:
       - main
-    paths-ignore: # ignore files that don't change build output
-      - '**/*.md'
-      - '**/.MD'
-      - .github/dependabot.yml
-      - .github/workflows/*.yml
-      - .gitignore
-      - LICENSE
   pull_request:
     branches:
       - main
-    paths-ignore: # ignore files that don't change build output
-      - '**/*.md'
-      - '**/.MD'
-      - .github/workflows/*.yml
-      - .github/dependabot.yml
-      - .gitignore
-      - LICENSE
   workflow_dispatch:
     inputs:
       branch:
