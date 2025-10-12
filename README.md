@@ -56,8 +56,10 @@ For WLAN Pi's A/B partition system, bind mounts provide:
 
 The service runs very early in the boot process:
 
-- Before `ssh.service` to ensure host keys are available when SSH starts
 - After `local-fs.target` to ensure /home is mounted
+- After `expand-home-partition.service` to ensure /home is expanded and mounted
+- Before `shutdown.target` to ensure clean shutdown handling
+- In `sysinit.target` with `DefaultDependencies=no` for early boot execution
 
 ## Verification
 
