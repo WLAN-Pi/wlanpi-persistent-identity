@@ -2,7 +2,7 @@
 Description=Persistent system identity for A/B partitions
 Documentation=https://github.com/wlan-pi/wlanpi-persistent-identity
 DefaultDependencies=no
-After=local-fs.target
+After=local-fs.target expand-home-partition.service
 Before=systemd-journald.service ssh.service systemd-hostnamed.service systemd-networkd.service
 RequiresMountsFor=/home
 
