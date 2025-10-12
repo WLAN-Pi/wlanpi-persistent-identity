@@ -1,7 +1,16 @@
 #!/bin/bash
 set -e
 
-systemctl disable wlanpi-persistent-identity.service 2>/dev/null || true
-systemctl stop wlanpi-persistent-identity.service 2>/dev/null || true
+case "$1" in
+    remove)
+        # Disable the service so it won't start on next boot
+        systemctl disable wlanpi-persistent-identity.service 2>/dev/null || true
+        
+        # Unmask regenerate_ssh_host_keys to restore default behavior
+        if systemctl list-unit-files regenerate_ssh_host_keys.service >/dev/null 2>&1; then
+            systemctl unmask regenerate_ssh_host_keys.service 2>/dev/null || true
+        fi
+        ;;
+esac
 
 exit 0

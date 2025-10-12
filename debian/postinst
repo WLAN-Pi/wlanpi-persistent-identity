@@ -1,12 +1,23 @@
 #!/bin/bash
 set -e
 
-chmod +x /usr/local/sbin/setup-persistent-identity
+case "$1" in
+    configure)
+        # Ensure script is executable
+        chmod +x /usr/local/sbin/setup-persistent-identity
 
-systemctl daemon-reload
-systemctl enable wlanpi-persistent-identity.service
+        # Mask regenerate_ssh_host_keys
+        if systemctl list-unit-files regenerate_ssh_host_keys.service >/dev/null 2>&1; then
+            systemctl mask regenerate_ssh_host_keys.service >/dev/null 2>&1 || true
+        fi
 
-echo "wlanpi-persistent-identity installed. Persistence will activate on next boot."
-echo "To activate now: sudo systemctl start wlanpi-persistent-identity.service"
+        # Reload systemd and enable service
+        systemctl daemon-reload
+        systemctl enable wlanpi-persistent-identity.service
+
+        echo "wlanpi-persistent-identity installed. Persistence will activate on next boot."
+        echo "To activate now: sudo systemctl start wlanpi-persistent-identity.service"
+        ;;
+esac
 
 exit 0
