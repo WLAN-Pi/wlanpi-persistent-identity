@@ -1,6 +1,6 @@
 # wlanpi-persistent-identity
 
-Prevents "host identification changed" SSH warnings and maintains stable machine-id for systemd services across A/B partition switches.
+Prevents "host identification changed" SSH warnings across A/B partition switches.
 
 ## How it works
 
@@ -8,7 +8,7 @@ This package uses bind mounts to make persistent copies of identity files appear
 
 On first boot, the service:
 
-1. Generates machine-id and SSH host keys if they don't exist
+1. Generates SSH host keys if they don't exist
 2. Copies these files to `/home/.persistent-identity/`
 3. Bind mounts the persistent copies over the system locations
 4. On subsequent boots or partition switches, restores from persistent storage
@@ -17,7 +17,7 @@ If installed after first boot, existing identity files are saved to persistent s
 
 **Important:** Persistent storage always takes precedence. If identity files exist in both locations, the persistent version overwrites the local version to maintain consistency across partitions.
 
-This ensures SSH host keys and machine-id remain constant across A/B partition switches, while allowing each partition's other configurations to differ.
+This ensures SSH host keys remain constant across A/B partition switches, while allowing each partition's other configurations to differ.
 
 ### What gets persisted
 
@@ -27,7 +27,6 @@ The package persists these files to `/home/.persistent-identity/`:
 
 - `/etc/ssh/ssh_host_ecdsa_key` and `.pub`
 - `/etc/ssh/ssh_host_ed25519_key` and `.pub`
-- `/etc/machine-id`
 
 **Note:** RSA keys are not managed by this utility as they are deprecated in modern SSH.
 
@@ -57,7 +56,6 @@ For WLAN Pi's A/B partition system, bind mounts provide:
 
 The service runs very early in the boot process:
 
-- Before `systemd-journald.service` to ensure machine-id exists before logging starts
 - Before `ssh.service` to ensure host keys are available when SSH starts
 - After `local-fs.target` to ensure /home is mounted
 
@@ -79,7 +77,6 @@ Check persistent storage:
 
 ```bash
 ls -la /home/.persistent-identity/etc/ssh/
-cat /home/.persistent-identity/etc/machine-id
 ```
 
 View logs:
