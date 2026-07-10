@@ -1,3 +1,9 @@
+wlanpi-persistent-identity (1.0.0-2) bookworm; urgency=medium
+
+  * Rebuild to publish packages for Debian trixie to packagecloud
+
+ -- Josh Schmelzle <josh@joshschmelzle.com>  Thu, 09 Jul 2026 23:27:15 -0400
+
 wlanpi-persistent-identity (1.0.0-1) bookworm; urgency=medium
 
   * Initial release of WLAN Pi persistent identity.

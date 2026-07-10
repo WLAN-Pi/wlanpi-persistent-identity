@@ -40,7 +40,7 @@ jobs:
           echo "branch_name=$SANITIZED_BRANCH" >> "$GITHUB_ENV"
 
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.branch || github.ref }}
 
@@ -83,7 +83,7 @@ jobs:
           mv ../*.deb build/
 
       - name: Upload Debian package
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: wlanpi-persistent-identity_${{ env.new_version }}
           path: build/*.deb
