@@ -14,6 +14,10 @@ on:
         required: false
         default: 'main'
 
+permissions:
+  contents: read
+  actions: read
+
 jobs:
   build-deb:
     name: Build and Package
