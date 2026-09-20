@@ -26,13 +26,17 @@ jobs:
     steps:
       - name: Determine branch name
         id: branch
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_BRANCH: ${{ github.event.inputs.branch }}
+          HEAD_REF: ${{ github.head_ref }}
         run: |
           # If triggered manually, use the input.
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            RAW_BRANCH="${{ github.event.inputs.branch }}"
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            RAW_BRANCH="$INPUT_BRANCH"
           # If triggered by a pull_request, use github.head_ref.
-          elif [ "${{ github.event_name }}" = "pull_request" ]; then
-            RAW_BRANCH="${{ github.head_ref }}"
+          elif [ "$EVENT_NAME" = "pull_request" ]; then
+            RAW_BRANCH="$HEAD_REF"
           # Otherwise (push), parse the branch from GITHUB_REF.
           else
             RAW_BRANCH="${GITHUB_REF##*/}"
@@ -65,7 +69,7 @@ jobs:
           fi
 
           # Split version into major/minor/patch (assuming X.Y.Z format)
-          IFS='.' read -r MAJOR MINOR PATCH <<< "$BASE_VERSION"
+          IFS='.' read -r MAJOR MINOR _ <<< "$BASE_VERSION"
 
           # Use the sanitized branch name
           BRANCH_NAME="${{ env.branch_name }}"
@@ -78,7 +82,7 @@ jobs:
           export DEBEMAIL="actions@github.com"
           dch --force-distribution -v "$NEW_VERSION" -D "unstable" "Automated build of version $NEW_VERSION"
 
-          echo "new_version=$NEW_VERSION" >> $GITHUB_ENV
+          echo "new_version=$NEW_VERSION" >> "$GITHUB_ENV"
 
       - name: Build Debian package
         run: |
