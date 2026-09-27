@@ -15,6 +15,8 @@ On first boot, the service:
 
 If installed after first boot, existing identity files are saved to persistent storage.
 
+If `/home` is not a separate mount (a plain, non-A/B image), there is nowhere to persist to. The service then only generates any missing SSH host keys with `ssh-keygen -A`, because the package masks `regenerate_ssh_host_keys`.
+
 **Important:** Persistent storage always takes precedence. If identity files exist in both locations, the persistent version overwrites the local version to maintain consistency across partitions.
 
 This ensures SSH host keys remain constant across A/B partition switches, while allowing each partition's other configurations to differ.
