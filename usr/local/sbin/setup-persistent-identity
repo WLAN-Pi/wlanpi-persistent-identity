@@ -32,10 +32,14 @@ if ! mountpoint -q /home; then
     # No separate /home (plain, non-A/B image): nothing to persist to. postinst
     # masks regenerate_ssh_host_keys, so create any missing host keys here.
     log "/home is not a separate mount - generating missing SSH host keys without persistence"
-    if ! ssh-keygen -A; then
-        error "Failed to generate SSH host keys"
-        exit 1
-    fi
+    # ssh-keygen -A exits 0 even when it cannot write a key, so check the result.
+    ssh-keygen -A
+    for type in rsa ecdsa ed25519; do
+        if [ ! -s "/etc/ssh/ssh_host_${type}_key" ]; then
+            error "Failed to generate SSH host key /etc/ssh/ssh_host_${type}_key"
+            exit 1
+        fi
+    done
     exit 0
 fi
 
