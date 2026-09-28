@@ -29,8 +29,18 @@ touch "$LOG_FILE" 2>/dev/null || true
 log "Starting persistent identity setup"
 
 if ! mountpoint -q /home; then
-    error "/home is not mounted - cannot setup persistent identity"
-    exit 1
+    # No separate /home (plain, non-A/B image): nothing to persist to. postinst
+    # masks regenerate_ssh_host_keys, so create any missing host keys here.
+    log "/home is not a separate mount - generating missing SSH host keys without persistence"
+    # ssh-keygen -A exits 0 even when it cannot write a key, so check the result.
+    ssh-keygen -A
+    for type in rsa ecdsa ed25519; do
+        if [ ! -s "/etc/ssh/ssh_host_${type}_key" ]; then
+            error "Failed to generate SSH host key /etc/ssh/ssh_host_${type}_key"
+            exit 1
+        fi
+    done
+    exit 0
 fi
 
 if ! mkdir -p "$PERSISTENT_BASE"; then

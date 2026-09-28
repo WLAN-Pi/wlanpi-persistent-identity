@@ -1,3 +1,13 @@
+wlanpi-persistent-identity (1.1.0-1) bookworm; urgency=medium
+
+  * Generate missing SSH host keys on images without a separate /home
+    instead of failing. The package masks regenerate_ssh_host_keys, so
+    plain (non-A/B) images booted with no host keys and no SSH (#8).
+  * Order the service before ssh.service so sshd never starts before the
+    host keys are generated or bind-mounted.
+
+ -- Josh Schmelzle <josh@joshschmelzle.com>  Sun, 27 Sep 2026 17:16:10 -0400
+
 wlanpi-persistent-identity (1.0.0-2) bookworm; urgency=medium
 
   * Rebuild to publish packages for Debian trixie to packagecloud
