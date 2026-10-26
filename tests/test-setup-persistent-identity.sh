@@ -1,10 +1,4 @@
 #!/bin/bash
-# Regression check for setup-persistent-identity on images without a
-# separate /home (issue #8). It deletes /etc/ssh host keys, so it only runs
-# inside a throwaway container:
-#
-#   podman run --rm -v "$PWD":/src:ro,Z docker.io/library/debian:bookworm \
-#       bash /src/tests/test-setup-persistent-identity.sh
 set -eu
 
 if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
@@ -12,7 +6,7 @@ if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
     exit 2
 fi
 
-SCRIPT="$(cd "$(dirname "$0")/.." && pwd)/usr/local/sbin/setup-persistent-identity"
+SCRIPT="$(cd "$(dirname "$0")/.." && pwd)/usr/libexec/wlanpi-persistent-identity/setup-persistent-identity"
 command -v ssh-keygen >/dev/null || {
     apt-get -qq update >/dev/null
     apt-get -qq install -y --no-install-recommends openssh-client util-linux >/dev/null

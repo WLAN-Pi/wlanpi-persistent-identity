@@ -1,3 +1,2 @@
-usr/local/sbin/setup-persistent-identity
-etc/systemd/system/wlanpi-persistent-identity.service
+usr/libexec/wlanpi-persistent-identity/setup-persistent-identity
 etc/logrotate.d/wlanpi-persistent-identity

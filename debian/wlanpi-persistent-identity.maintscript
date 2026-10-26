@@ -1,0 +1,1 @@
+rm_conffile /etc/systemd/system/wlanpi-persistent-identity.service 1.1.0-1

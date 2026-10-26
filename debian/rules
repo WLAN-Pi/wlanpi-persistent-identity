@@ -3,5 +3,5 @@
 %:
 	dh $@
 
-override_dh_usrlocal:
-	# Skip dh_usrlocal 
+override_dh_installsystemd:
+	dh_installsystemd --no-start

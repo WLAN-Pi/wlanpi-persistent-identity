@@ -11,7 +11,7 @@ RequiresMountsFor=/home
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/usr/local/sbin/setup-persistent-identity
+ExecStart=/usr/libexec/wlanpi-persistent-identity/setup-persistent-identity
 
 [Install]
 WantedBy=sysinit.target

@@ -10,15 +10,20 @@
 
 set -e
 
-SERVICE_FILE="/etc/systemd/system/wlanpi-persistent-identity.service"
+ETC_UNIT="/etc/systemd/system/wlanpi-persistent-identity.service"
+LIB_UNIT="/usr/lib/systemd/system/wlanpi-persistent-identity.service"
 
 if [ "$(id -u)" -ne 0 ]; then
     echo "Error: This script must be run as root (use sudo)"
     exit 1
 fi
 
-if [ ! -f "$SERVICE_FILE" ]; then
-    echo "Error: $SERVICE_FILE not found"
+if [ -f "$ETC_UNIT" ]; then
+    SERVICE_FILE="$ETC_UNIT"
+elif [ -f "$LIB_UNIT" ]; then
+    SERVICE_FILE="$LIB_UNIT"
+else
+    echo "Error: wlanpi-persistent-identity.service not found"
     exit 1
 fi
 
