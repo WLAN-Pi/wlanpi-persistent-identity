@@ -1,0 +1,22 @@
+name: Test
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  setup-persistent-identity:
+    name: setup-persistent-identity
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Run the no-home regression test
+        run: docker run --rm -v "$PWD":/src:ro -e DEBIAN_FRONTEND=noninteractive docker.io/library/debian:trixie bash /src/tests/test-setup-persistent-identity.sh
