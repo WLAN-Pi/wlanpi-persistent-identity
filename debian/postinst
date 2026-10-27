@@ -14,4 +14,8 @@ esac
 
 #DEBHELPER#
 
+if [ "$1" = configure ] && [ -d /run/systemd/system ]; then
+    systemctl daemon-reload || true
+fi
+
 exit 0

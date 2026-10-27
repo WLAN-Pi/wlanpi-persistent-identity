@@ -5,8 +5,6 @@ set -e
 
 case "$1" in
     remove)
-        systemctl disable wlanpi-persistent-identity.service 2>/dev/null || true
-
         if systemctl list-unit-files regenerate_ssh_host_keys.service >/dev/null 2>&1; then
             systemctl unmask regenerate_ssh_host_keys.service 2>/dev/null || true
         fi
